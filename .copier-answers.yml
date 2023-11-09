@@ -1,0 +1,19 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.2.3
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: 1211@mail.sustech.edu.cn
+author_name: Zhiming Zhang
+data_format: string
+file_extension: ''
+has_binder: true
+has_settings: false
+kind: frontend
+labextension_name: jupyterlab_apod
+mimetype: ''
+mimetype_name: ''
+project_short_description: A JupyterLab extension.
+python_name: jupyterlab_apod
+repository: https://github.com/SusTzzm2003/Jupyter_ext_dev.git
+test: true
+viewer_name: ''
+
