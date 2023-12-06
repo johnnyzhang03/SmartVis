@@ -8,6 +8,8 @@ import {
     Notebook
   } from '@jupyterlab/notebook';
   import { CodeCell, Cell, isCodeCellModel } from '@jupyterlab/cells';
+import { eventCenter } from './event';
+import OpenAI from 'openai';
   
   const CHAPYTER_CHAT_CELL = 'jp-chapyter-chat';
   const CHAPYTER_CHAT_CELL_EXECUTING = 'jp-chapyter-chat-executing';
@@ -177,6 +179,16 @@ import {
     // delete anything so that users are aware *something* happened.
     notebook.deselectAll();
   }
+
+  async function passToOpenAI(code:string) {
+    const openai = new OpenAI({
+      apiKey: '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', 
+      dangerouslyAllowBrowser: true
+    });
+    const response = await openai.chat.completions
+  .create({ messages: [{ role: 'user', content: code + " "  + 'This code has an error, please help me fix it. Just output pure code, no description.' }], model: 'gpt-3.5-turbo' });
+    return response.choices[0].message.content
+  }
   
   /**
    * Initialization data for the @shannon-shen/chapyter extension.
@@ -188,6 +200,19 @@ import {
     requires: [INotebookTracker],
     // optional: [ISettingRegistry],
     activate: (app: JupyterFrontEnd, tracker: INotebookTracker) => {
+      const EventEmitter = require('events')
+ 
+      eventCenter.on('fixCurrentCell', async  (data) => {
+        console.log(data)
+        let notebook = tracker.currentWidget!;
+        let activeCell = notebook.content.activeCell!
+        const sourceCode = activeCell.model.sharedModel.getSource()
+        let response = await passToOpenAI(sourceCode)
+        console.log(response)
+        activeCell.model.sharedModel.setSource(`#New Code\n${response}`)
+        // notebook.exe        
+      })
+
       NotebookActions.executed.connect((sender, args) => {
         if (args.success) {
           // It must be true that the cell is a code cell (otherwise it would not have been executed)

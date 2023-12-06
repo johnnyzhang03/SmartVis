@@ -57,10 +57,14 @@
     "dependencies": {
         "@jupyterlab/application": "^4.0.8",
         "@jupyterlab/apputils": "^4.1.8",
-        "@lumino/widgets": "^2.3.1"
+        "@lumino/widgets": "^2.3.1",
+        "ansi-to-html": "^0.7.2",
+        "events": "^3.3.0",
+        "openai": "^4.20.1"
     },
     "devDependencies": {
         "@jupyterlab/builder": "^4.0.0",
+        "@jupyterlab/rendermime": "^4.0.9",
         "@jupyterlab/testutils": "^4.0.0",
         "@types/jest": "^29.2.0",
         "@types/json-schema": "^7.0.11",
