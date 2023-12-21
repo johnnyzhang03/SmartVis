@@ -9,3 +9,12 @@
     align-items: center;
     overflow: auto;
   }
+
+
+
+.jp-CodeCell .jp-CellFooter {
+    height: auto;
+    order: 2;
+    margin-top: 10px;
+    margin-left: 73px;
+  }

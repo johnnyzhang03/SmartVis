@@ -182,7 +182,7 @@ import OpenAI from 'openai';
 
   async function passToOpenAI(code:string) {
     const openai = new OpenAI({
-      apiKey: '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', 
+      apiKey: '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', 
       dangerouslyAllowBrowser: true
     });
     const response = await openai.chat.completions
@@ -208,7 +208,6 @@ import OpenAI from 'openai';
         let activeCell = notebook.content.activeCell!
         const sourceCode = activeCell.model.sharedModel.getSource()
         let response = await passToOpenAI(sourceCode)
-        console.log(response)
         activeCell.model.sharedModel.setSource(`#New Code\n${response}`)
         // notebook.exe        
       })
