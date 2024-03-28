@@ -1,27 +1,15 @@
-# jupyterlab_apod
+# jupyterlab_auto-data-analysis
 
-[![Github Actions Status](https://github.com/SusTzzm2003/Jupyter_ext_dev.git/workflows/Build/badge.svg)](https://github.com/SusTzzm2003/Jupyter_ext_dev.git/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SusTzzm2003/Jupyter_ext_dev.git/main?urlpath=lab)
 A JupyterLab extension.
+
+## Features
+- Code error detection and fix
+- Code explannation
+- Upload a file and code cells for analysis and visualization will be generated automatically.
 
 ## Requirements
 
 - JupyterLab >= 4.0.0
-
-## Install
-
-To install the extension, execute:
-
-```bash
-pip install jupyterlab_apod
-```
-
-## Uninstall
-
-To remove the extension, execute:
-
-```bash
-pip uninstall jupyterlab_apod
-```
 
 ## Contributing
 
@@ -59,12 +47,6 @@ By default, the `jlpm build` command generates the source maps for this extensio
 
 ```bash
 jupyter lab build --minimize=False
-```
-
-### Development uninstall
-
-```bash
-pip uninstall jupyterlab_apod
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
