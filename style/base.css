@@ -10,11 +10,63 @@
     overflow: auto;
   }
 
-
-
 .jp-CodeCell .jp-CellFooter {
     height: auto;
     order: 2;
     margin-top: 10px;
     margin-left: 73px;
   }
+
+  .btn {
+    margin-top: 10px;
+  }
+
+  .jp-shout-button {
+    height: 30px;
+    width: 150px;
+    margin: 8px;
+    padding-top: 9px;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 2px;
+    background-color: #2296f3;
+    color: #212121;
+  }
+  
+  .jp-shout-summary {
+    margin: 4px;
+  }
+
+  /* Modify Jupyter Styles */
+
+.lm-BoxPanel-child,
+.jp-FileBrowser-Panel,
+.lm-StackedPanel-child,
+.jp-FileBrowser-toolbar {
+  background-color: #aecad4 !important;
+}
+
+#top-panel-wrapper,
+#jp-top-bar {
+  background-color: #aecad4 !important;
+}
+
+#menu-panel-wrapper,
+#jp-MainMenu,
+#menu-panel {
+  background-color: #aecad4 !important;
+}
+
+.jp-NotebookPanel-toolbar {
+  background-color: #aecad4 !important;
+}
+
+.lm-MenuBar-content {
+  color: #02484d;
+}
+
+.lm-TabBar-content,
+.jp-DirListing-content,
+.lm-MenuBar-content {
+  font-size: small;
+}

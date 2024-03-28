@@ -7,7 +7,7 @@ import {
     NotebookActions,
     Notebook
   } from '@jupyterlab/notebook';
-  import { CodeCell, Cell, isCodeCellModel } from '@jupyterlab/cells';
+  import { CodeCell, Cell, isCodeCellModel, CellModel, CodeCellModel } from '@jupyterlab/cells';
 import { eventCenter } from './event';
 import OpenAI from 'openai';
   
@@ -180,14 +180,23 @@ import OpenAI from 'openai';
     notebook.deselectAll();
   }
 
-  async function passToOpenAI(code:string) {
+  export async function passToOpenAI(code: string) {
     const openai = new OpenAI({
-      apiKey: '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', 
-      dangerouslyAllowBrowser: true
+        // apiKey: '',
+        dangerouslyAllowBrowser: true
     });
     const response = await openai.chat.completions
-  .create({ messages: [{ role: 'user', content: code + " "  + 'This code has an error, please help me fix it. Just output pure code, no description.' }], model: 'gpt-3.5-turbo' });
+        .create({   messages: [{ role: 'user', content: code + " " + 'Please explain the structure and function of my code. Give your answer in the form of python comment.' }], model: 'gpt-3.5-turbo' });
     return response.choices[0].message.content
+}
+
+  async function analyzeFileByOpenAI(file: File) {
+    const openai = new OpenAI({
+      apiKey: '', 
+      dangerouslyAllowBrowser: true
+    });
+    const response = await openai.files.create({ file: file, purpose: 'assistants' });
+    return response.filename
   }
   
   /**
@@ -200,17 +209,36 @@ import OpenAI from 'openai';
     requires: [INotebookTracker],
     // optional: [ISettingRegistry],
     activate: (app: JupyterFrontEnd, tracker: INotebookTracker) => {
-      const EventEmitter = require('events')
- 
       eventCenter.on('fixCurrentCell', async  (data) => {
-        console.log(data)
         let notebook = tracker.currentWidget!;
         let activeCell = notebook.content.activeCell!
         const sourceCode = activeCell.model.sharedModel.getSource()
         let response = await passToOpenAI(sourceCode)
-        activeCell.model.sharedModel.setSource(`#New Code\n${response}`)
-        // notebook.exe        
-      })
+        activeCell.model.sharedModel.setSource(`#New Code\n${response}`)       
+      });
+
+      eventCenter.on('addNewCell', async (file) => {
+        const notebook = tracker.currentWidget!.content;
+        const model = tracker.currentWidget!.model;
+        model?.sharedModel.addCell({
+        cell_type: "code",
+        metadata:
+          notebook?.notebookConfig.defaultCell === 'code'
+            ? {
+               // This is an empty cell created by user, thus is trusted
+              trusted: true
+             }
+            : {}
+        }); 
+        let response = await analyzeFileByOpenAI(file);
+        const cellList = notebook.model?.cells;
+        const cellModel : CellModel = cellList?.get(cellList.length-1) as CellModel
+        if (isCodeCellModel(cellModel)) {
+         const isCodeCellModel: CodeCellModel = cellModel as CodeCellModel;
+        }
+        cellModel.sharedModel.setSource(`#File name: ${response}`);
+      });
+
 
       NotebookActions.executed.connect((sender, args) => {
         if (args.success) {

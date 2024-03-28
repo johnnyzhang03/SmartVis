@@ -23,7 +23,6 @@ export class StdErrorWidget extends RenderedCommon {
    */
   constructor(options: IRenderMime.IRendererOptions) {
     super(options);
-    console.log("stderr render created")
     this._mimeType = options.mimeType;
     this.addClass(CLASS_NAME);
     this.addClass('jp-RenderedText');
@@ -50,7 +49,7 @@ export class StdErrorWidget extends RenderedCommon {
       /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
     this.button.addEventListener("click", ()=> {
       eventCenter.emit("fixCurrentCell", data)
-    })
+    });
   }
 
 
