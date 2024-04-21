@@ -23,7 +23,7 @@ import {
 
 import '../style/index.css';
 
-import { passToOpenAI } from './chapyter_extension';
+import { passToOpenAI } from './file_analysis_extension';
 
 
 /**

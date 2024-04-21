@@ -51,7 +51,7 @@
         "stylelint:check": "stylelint --cache \"style/**/*.css\"",
         "test": "jest --coverage",
         "watch": "run-p watch:src watch:labextension",
-        "watch:src": "tsc -w --sourceMap",
+        "watch:src": "tsc -w --sourceMap -p tsconfig.dev.json",
         "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
@@ -62,7 +62,8 @@
         "@phosphor/commands": "^1.7.2",
         "ansi-to-html": "^0.7.2",
         "events": "^3.3.0",
-        "openai": "^4.20.1"
+        "lumino": "^2.6.0",
+        "openai": "^4.38.2"
     },
     "devDependencies": {
         "@jupyterlab/builder": "^4.0.0",
@@ -153,14 +154,6 @@
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-namespace": "off",
             "@typescript-eslint/no-use-before-define": "off",
-            "@typescript-eslint/quotes": [
-                "error",
-                "single",
-                {
-                    "avoidEscape": true,
-                    "allowTemplateLiterals": false
-                }
-            ],
             "curly": [
                 "error",
                 "all"
