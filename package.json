@@ -104,7 +104,6 @@
     },
     "jupyterlab": {
         "extension": true,
-        "mimeExtension": "./lib/renderer.js",
         "outputDir": "jupyterlab_apod/labextension"
     },
     "eslintIgnore": [

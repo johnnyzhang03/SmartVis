@@ -1,6 +1,6 @@
-import { IRenderMime } from '@jupyterlab/rendermime-interfaces'
-import {RenderedCommon, renderText} from "@jupyterlab/rendermime"
-import { eventCenter } from './event'
+import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
+import { RenderedCommon, renderText } from '@jupyterlab/rendermime';
+import { eventCenter } from './event';
 
 // import movieIcon from '../style/movie.svg';
 
@@ -27,15 +27,15 @@ export class StdErrorWidget extends RenderedCommon {
     this.addClass(CLASS_NAME);
     this.addClass('jp-RenderedText');
     this.button = document.createElement('button');
-    this.button.textContent = "Fix by AI";
-    this.div = document.createElement("div")
+    this.button.textContent = 'Fix by AI';
+    this.div = document.createElement('div');
   }
-  
+
   /**
    * Render stderr into this widget's node.
    */
-   async render(model: IRenderMime.IMimeModel) {
-    const result = await renderText({
+  async render(model: IRenderMime.IMimeModel) {
+    await renderText({
       host: this.node,
       sanitizer: this.sanitizer,
       source: String(model.data[this.mimeType]),
@@ -43,21 +43,20 @@ export class StdErrorWidget extends RenderedCommon {
     });
     this.node.appendChild(this.button);
     this.node.appendChild(this.div);
-    
-    let data = model.data[this._mimeType] as string
+
+    let data = model.data[this._mimeType] as string;
     data = data.replace(
-      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
-    this.button.addEventListener("click", ()=> {
-      eventCenter.emit("fixCurrentCell", data)
+      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+      ''
+    );
+    this.button.addEventListener('click', () => {
+      eventCenter.emit('fixCurrentCell', data);
     });
   }
-
 
   private button: HTMLButtonElement;
   private div: HTMLDivElement;
   private _mimeType: string;
-
-  
 }
 
 /**
@@ -83,10 +82,10 @@ const extension: IRenderMime.IExtension = {
       name: 'stderr',
       extensions: ['.stderr'],
       fileFormat: 'base64',
-    //   icon: {
-    //     name: '@jupyterlab-examples/mimerenderer:video',
-    //     svgstr: movieIcon
-    //   },
+      //   icon: {
+      //     name: '@jupyterlab-examples/mimerenderer:video',
+      //     svgstr: movieIcon
+      //   },
       mimeTypes: [MIME_TYPE]
     }
   ],
