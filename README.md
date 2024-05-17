@@ -1,11 +1,10 @@
-# jupyterlab_auto-data-analysis
+# SmartVis
 
 A JupyterLab extension.
 
 ## Features
+- Upload a file and python code for data visualization will be generated automatically based on the file.
 - Code error detection and fix
-- Code explannation
-- Upload a file and code cells for analysis and visualization will be generated automatically.
 
 ## Requirements
 
