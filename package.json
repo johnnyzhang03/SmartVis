@@ -14,7 +14,7 @@
     "license": "BSD-3-Clause",
     "author": {
         "name": "Zhiming Zhang",
-        "email": "1211@mail.sustech.edu.cn"
+        "email": "12112720@mail.sustech.edu.cn"
     },
     "files": [
         "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
@@ -61,6 +61,7 @@
         "@lumino/widgets": "^2.3.1",
         "@phosphor/commands": "^1.7.2",
         "ansi-to-html": "^0.7.2",
+        "antd": "^5.17.3",
         "events": "^3.3.0",
         "lumino": "^2.6.0",
         "openai": "^4.38.2"

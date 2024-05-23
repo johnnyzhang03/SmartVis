@@ -119,3 +119,26 @@ export function deleteCell(notebook: Notebook, cell: Cell): void {
   // delete anything so that users are aware *something* happened.
   notebook.deselectAll();
 }
+
+export function extractPythonCode(
+  input: string,
+  filePath: string
+): string | null {
+  const regex = /```python\s+([\s\S]*?)\s+```/g;
+  let match;
+  let result = '';
+
+  while ((match = regex.exec(input)) !== null) {
+    result += match[1] + '\n'; // Add a newline for separation between blocks
+  }
+  result = replaceFilePathInPythonCode(result, filePath);
+  return result.trim(); // Remove the last newline
+}
+
+function replaceFilePathInPythonCode(
+  input: string,
+  targetFilePath: string
+): string {
+  const regex = /pd\.read_csv\(['"]([^'"]*)['"]\)/g;
+  return input.replace(regex, `pd.read_csv('${targetFilePath}')`);
+}

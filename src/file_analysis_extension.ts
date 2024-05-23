@@ -4,11 +4,11 @@ import {
 } from '@jupyterlab/application';
 
 import { INotebookTracker } from '@jupyterlab/notebook';
-
 import { CellModel } from '@jupyterlab/cells';
 import { eventCenter } from './event';
 import OpenAI from 'openai';
 import { TextContentBlock } from 'openai/resources/beta/threads/messages';
+import { extractPythonCode } from './util';
 
 const openai = new OpenAI({
   apiKey: '',
@@ -26,7 +26,7 @@ export async function passToOpenAI(code: string) {
           'Please explain the structure and function of my code. Give your answer in the form of python comment.'
       }
     ],
-    model: 'gpt-3.5-turbo'
+    model: 'gpt-4o'
   });
   return response.choices[0].message.content;
 }
@@ -38,9 +38,8 @@ async function analyzeFileByOpenAI(csvFile: File) {
   });
 
   const assistant = await openai.beta.assistants.create({
-    instructions:
-      "You are an expert in analyzing csv file using python. Your job includes dataset overview, data cleaning, data preprocessing and data visualization. Please read through the csv file first and tailor every step based on the dataset's actual characteristics. Finally, you only need to output the python code, no need to run the result for me.",
-    model: 'gpt-3.5-turbo',
+    instructions: 'You are an expert in analyzing csv file using python.',
+    model: 'gpt-4o',
     tools: [{ type: 'code_interpreter' }]
   });
 
@@ -49,7 +48,11 @@ async function analyzeFileByOpenAI(csvFile: File) {
       {
         role: 'user',
         content:
-          "Please perform the dataset overview and data cleaning. The only thing you should output is the relevant Python code, don't say anything else and omit of the ```python ```  in your response please.",
+          'Make sure you 100% stick to the following instruction:\
+          1. A file(dataset) is attached along with this instruction. At the beginning, as a code interpreter, write python code to analyze the attached dataset and execute the code in your sandbox to get the domain knowledge of the dataset. DO NOT output the code you write at this step.\
+          2. Output Python code to read the dataset. For example, use pd.read_csv(). \
+          3. Followed with Python code which performs data visualization based on the domain knowledge you required in step 1. Three different diagrams are recommended. \
+          4. Your output should be TEXT ONLY, which contains 100% Python code ONLY without any descriptive text instruction. DO NOT output any file or image.',
         attachments: [
           {
             file_id: file.id,
@@ -69,6 +72,7 @@ async function analyzeFileByOpenAI(csvFile: File) {
     for (const message of messages.data.reverse()) {
       if (message.role === 'assistant') {
         const content = <TextContentBlock>message.content[0];
+        console.log(content.text);
         return content.text.value;
       }
     }
@@ -103,7 +107,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
         metadata:
           notebook?.notebookConfig.defaultCell === 'code'
             ? {
-                // This is an empty cell created by user, thus is trusted
                 trusted: true
               }
             : {}
@@ -113,9 +116,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
         cellList.length - 1
       ) as CellModel;
       cellModel.sharedModel.setSource('Analyzing...');
-      const returnCode = await analyzeFileByOpenAI(file);
-      if (typeof returnCode === 'string') {
-        cellModel.sharedModel.setSource(returnCode);
+      const returnMessage = await analyzeFileByOpenAI(file);
+      if (typeof returnMessage === 'string') {
+        const extractedCode = extractPythonCode(returnMessage, file.name);
+        if (typeof extractedCode === 'string') {
+          cellModel.sharedModel.setSource(extractedCode);
+        }
       }
     });
   }
