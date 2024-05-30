@@ -48,10 +48,10 @@ async function analyzeFileByOpenAI(csvFile: File) {
       {
         role: 'user',
         content:
-          'Make sure you 100% stick to the following instruction:\
+          'Make sure you stick to the following instruction:\
           1. A file(dataset) is attached along with this instruction. At the beginning, as a code interpreter, write python code to analyze the attached dataset and execute the code in your sandbox to get the domain knowledge of the dataset. DO NOT output the code you write at this step.\
-          2. Output Python code to read the dataset. For example, use pd.read_csv(). \
-          3. Followed with Python code which performs data visualization based on the domain knowledge you required in step 1. Three different diagrams are recommended. \
+          2. Output Python code to read the dataset. For example, use pd.read_csv(). Replace the file path in read_csv() with the actual file name. \
+          3. Followed with Python code which performs data visualization based on the domain knowledge you required at step 1. Three different diagrams are recommended. \
           4. Your output should be TEXT ONLY, which contains 100% Python code ONLY without any descriptive text instruction. DO NOT output any file or image.',
         attachments: [
           {

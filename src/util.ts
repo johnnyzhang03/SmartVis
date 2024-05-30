@@ -131,14 +131,10 @@ export function extractPythonCode(
   while ((match = regex.exec(input)) !== null) {
     result += match[1] + '\n'; // Add a newline for separation between blocks
   }
-  result = replaceFilePathInPythonCode(result, filePath);
+  result = replaceContentInReadCsv(result, filePath);
   return result.trim(); // Remove the last newline
 }
 
-function replaceFilePathInPythonCode(
-  input: string,
-  targetFilePath: string
-): string {
-  const regex = /pd\.read_csv\(['"]([^'"]*)['"]\)/g;
-  return input.replace(regex, `pd.read_csv('${targetFilePath}')`);
+function replaceContentInReadCsv(input: string, target: string): string {
+  return input.replace(/pd\.read_csv\((.*?)\)/, `pd.read_csv('${target}')`);
 }
