@@ -10,7 +10,7 @@ import { ReactWidget } from '@jupyterlab/ui-components';
 import { Widget } from '@lumino/widgets';
 import SidePanel from './components/SidePanel';
 import React from 'react';
-import { passToOpenAI, analyzeFileByOpenAI } from './openai';
+import { generateChart } from './openai';
 import { extractPythonCode } from './util';
 
 export const smartVis: JupyterFrontEndPlugin<void> = {
@@ -30,13 +30,13 @@ export const smartVis: JupyterFrontEndPlugin<void> = {
     app.shell.add(myWidget, 'right');
 
     // Function part
-    eventCenter.on('fixCurrentCell', async () => {
-      let notebook = tracker.currentWidget!;
-      let activeCell = notebook.content.activeCell!;
-      const sourceCode = activeCell.model.sharedModel.getSource();
-      let response = await passToOpenAI(sourceCode);
-      activeCell.model.sharedModel.setSource(`#New Code\n${response}`);
-    });
+    // eventCenter.on('fixCurrentCell', async () => {
+    //   let notebook = tracker.currentWidget!;
+    //   let activeCell = notebook.content.activeCell!;
+    //   const sourceCode = activeCell.model.sharedModel.getSource();
+    //   let response = await passToOpenAI(sourceCode);
+    //   activeCell.model.sharedModel.setSource(`#New Code\n${response}`);
+    // });
 
     eventCenter.on('addNewCell', async file => {
       const notebook = tracker.currentWidget!.content;
@@ -56,7 +56,7 @@ export const smartVis: JupyterFrontEndPlugin<void> = {
         cellList.length - 1
       ) as CellModel;
       cellModel.sharedModel.setSource('Analyzing...');
-      const returnMessage = await analyzeFileByOpenAI(file);
+      const returnMessage = await generateChart(file);
       if (typeof returnMessage === 'string') {
         const extractedCode = extractPythonCode(returnMessage, file.name);
       if (typeof extractedCode === 'string') {

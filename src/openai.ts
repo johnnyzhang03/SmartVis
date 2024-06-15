@@ -1,37 +1,28 @@
 import OpenAI from 'openai';
-import { TextContentBlock } from 'openai/resources/beta/threads/messages';
+import {
+  ImageFileContentBlock,
+  TextContentBlock
+} from 'openai/resources/beta/threads/messages';
 
+interface ChartResponse {
+  src: string;
+  description: string;
+}
 const openai = new OpenAI({
   apiKey: '',
   dangerouslyAllowBrowser: true
 });
 
-export async function passToOpenAI(code: string) {
-  const response = await openai.chat.completions.create({
-    messages: [
-      {
-        role: 'user',
-        content:
-          code +
-          ' ' +
-          'Please explain the structure and function of my code. Give your answer in the form of python comment.'
-      }
-    ],
-    model: 'gpt-4o'
-  });
-  return response.choices[0].message.content;
-}
+const assistant = await openai.beta.assistants.create({
+  instructions: 'You are an expert in analyzing csv file using python.',
+  model: 'gpt-4o',
+  tools: [{ type: 'code_interpreter' }]
+});
 
-export async function analyzeFileByOpenAI(csvFile: File) {
+export async function generateChart(csvFile: File) {
   const file = await openai.files.create({
     file: csvFile,
     purpose: 'assistants'
-  });
-
-  const assistant = await openai.beta.assistants.create({
-    instructions: 'You are an expert in analyzing csv file using python.',
-    model: 'gpt-4o',
-    tools: [{ type: 'code_interpreter' }]
   });
 
   const thread = await openai.beta.threads.create({
@@ -61,14 +52,37 @@ export async function analyzeFileByOpenAI(csvFile: File) {
 
   if (run.status === 'completed') {
     const messages = await openai.beta.threads.messages.list(run.thread_id);
-    for (const message of messages.data.reverse()) {
+    const responseArray: ChartResponse[] = [];
+    for (const message of messages.data) {
       if (message.role === 'assistant') {
-        const content = <TextContentBlock>message.content[0];
-        console.log(content.text);
-        return content.text.value;
+        const imageContent = <ImageFileContentBlock>message.content[0];
+        let chartSrc = await idToSrc(imageContent.image_file.file_id);
+        const textContent = <TextContentBlock>message.content[1];
+        const text = textContent.text.value;
+        const response: ChartResponse = {
+          src: chartSrc,
+          description: text
+        };
+        responseArray.push(response);
       }
     }
+    return responseArray;
   } else {
     return run.status;
+  }
+
+  /**
+   * Inputs OpenAI File object's id
+   * Returns src needed in img label
+   */
+  async function idToSrc(id: string) {
+    const imageFile = await openai.files.content(id);
+    const imageData = await imageFile.arrayBuffer();
+    let binary = '';
+    let bytes = new Uint8Array(imageData);
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return 'data:image/png;base64,' + window.btoa(binary);
   }
 }
