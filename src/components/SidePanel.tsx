@@ -1,27 +1,32 @@
-import { eventCenter } from '../event';
 import { Button } from 'antd';
 import FileUpload from "./FileUpload";
 import { TemperatureSelect } from './TemperatureSelect';
 import React, { useState } from 'react';
 import { UserPromptInupt } from './UserPromptInput';
-import GrpahChoices from './GraphChoices';
+import ChartChoices from './ChartChoices';
+import { generateChart, ChartInformation } from '../openai';
 
 export default function SidePanel() {
+let initialList: ChartInformation[] = [];
 const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-const [showChoices, setShowChoices] = useState(false);
+const [generateClicked, setGenerateClicked] = useState(false);
+const [showCharts, setShowCharts] = useState(false);
+const [responseList, setResponseList] = useState(initialList);
 
-function handleGenerateClick() {
+async function handleGenerateClick() {
     if (uploadedFile) {
-        eventCenter.emit('addNewCell', uploadedFile);
-        setShowChoices(true);
+        setGenerateClicked(true);
+        let list = await generateChart(uploadedFile);
+        setResponseList(list as ChartInformation[]); 
+        setShowCharts(true); 
     } else {
         alert("No file uploaded.");
     }
 };
 return (
     <div className='container'>
-    {showChoices ? (
-        <GrpahChoices/>
+    {generateClicked ? (
+        <ChartChoices showCharts={showCharts} responseList={responseList} />
     ) : (
         <>
             <div className='upload'>

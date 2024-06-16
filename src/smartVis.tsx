@@ -41,7 +41,6 @@ export const smartVis: JupyterFrontEndPlugin<void> = {
     eventCenter.on('addNewCell', async file => {
       const notebook = tracker.currentWidget!.content;
       const model = tracker.currentWidget!.model;
-      console.log('still here')
       model?.sharedModel.addCell({
         cell_type: 'code',
         metadata:

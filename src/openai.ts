@@ -1,11 +1,14 @@
 import OpenAI from 'openai';
-import {
-  ImageFileContentBlock,
-  TextContentBlock
-} from 'openai/resources/beta/threads/messages';
+import { TextContentBlock } from 'openai/resources/beta/threads/messages';
 
-interface ChartResponse {
+export interface ChartInformation {
   src: string;
+  description: string;
+}
+
+interface ReturnObject {
+  id: string;
+  file_id: string;
   description: string;
 }
 const openai = new OpenAI({
@@ -16,7 +19,8 @@ const openai = new OpenAI({
 const assistant = await openai.beta.assistants.create({
   instructions: 'You are an expert in analyzing csv file using python.',
   model: 'gpt-4o',
-  tools: [{ type: 'code_interpreter' }]
+  tools: [{ type: 'code_interpreter' }],
+  temperature: 0.2
 });
 
 export async function generateChart(csvFile: File) {
@@ -25,17 +29,18 @@ export async function generateChart(csvFile: File) {
     purpose: 'assistants'
   });
 
+  const prompt = `
+  Step-1: Generate three different charts for data visualization based on the attached csv file.
+  Step-2: After each chart is generated, output a short text description for it. The description should stick to the following format:
+  <Title>Line chart of values over time</Title>
+  <Description>This line charts shows......</Description>
+   `;
+
   const thread = await openai.beta.threads.create({
     messages: [
       {
         role: 'user',
-        content:
-          'Generate three visualization graphs based on the attached file. The only thing you need to output is the graphs and short description for each one of them. ',
-        //   'Make sure you 100% stick to the following instruction:\
-        //     1. A file(dataset) is attached along with this instruction. At the beginning, as a code interpreter, write python code to analyze the attached dataset and execute the code in your sandbox to get the domain knowledge of the dataset. DO NOT output the code you write at this step.\
-        //     2. Output Python code to read the dataset. For example, use pd.read_csv(). \
-        //     3. Followed with Python code which performs data visualization based on the domain knowledge you required in step 1. Three different diagrams are recommended. \
-        //     4. Your output should be TEXT ONLY, which contains 100% Python code ONLY without any descriptive text instruction. DO NOT output any file or image.',
+        content: prompt,
         attachments: [
           {
             file_id: file.id,
@@ -52,18 +57,21 @@ export async function generateChart(csvFile: File) {
 
   if (run.status === 'completed') {
     const messages = await openai.beta.threads.messages.list(run.thread_id);
-    const responseArray: ChartResponse[] = [];
-    for (const message of messages.data) {
-      if (message.role === 'assistant') {
-        const imageContent = <ImageFileContentBlock>message.content[0];
-        let chartSrc = await idToSrc(imageContent.image_file.file_id);
-        const textContent = <TextContentBlock>message.content[1];
+    const message = messages.data[0];
+    const responseArray: ChartInformation[] = [];
+    if (message.role === 'assistant') {
+      const textContent = <TextContentBlock>message.content[0];
+      if (textContent.type === 'text') {
         const text = textContent.text.value;
-        const response: ChartResponse = {
-          src: chartSrc,
-          description: text
-        };
-        responseArray.push(response);
+        const jsonList: ReturnObject[] = extractJsonObject(text);
+        for (let item of jsonList) {
+          let src = await idToSrc(item.file_id);
+          const response: ChartInformation = {
+            src: src,
+            description: text
+          };
+          responseArray.push(response);
+        }
       }
     }
     return responseArray;
@@ -84,5 +92,23 @@ export async function generateChart(csvFile: File) {
       binary += String.fromCharCode(bytes[i]);
     }
     return 'data:image/png;base64,' + window.btoa(binary);
+  }
+
+  function extractJsonObject(jsonString: string): ReturnObject[] {
+    try {
+      // Remove the leading and trailing backticks and the 'json' label if present
+      const cleanedString = jsonString
+        .trim()
+        .replace(/^```json/, '')
+        .replace(/```$/, '')
+        .trim();
+
+      // Parse the JSON string
+      const jsonObject = JSON.parse(cleanedString);
+      return jsonObject;
+    } catch (error) {
+      console.error('Failed to parse JSON string:', error);
+      return [];
+    }
   }
 }
