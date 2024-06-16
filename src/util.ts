@@ -142,3 +142,25 @@ function replaceFilePathInPythonCode(
   const regex = /pd\.read_csv\(['"]([^'"]*)['"]\)/g;
   return input.replace(regex, `pd.read_csv('${targetFilePath}')`);
 }
+
+/**
+ * Extracts the content between <Title> and </Title> tags from the given string.
+ * @param input The input string containing the <Title> tags.
+ * @returns The extracted content of the <Title> tag.
+ */
+export function extractTitleContent(input: string): string {
+  const titleRegex = /<Title>(.*?)<\/Title>/;
+  const match = input.match(titleRegex);
+  return match ? match[1] : '';
+}
+
+/**
+ * Extracts the content between <Description> and </Description> tags from the given string.
+ * @param input The input string containing the <Description> tags.
+ * @returns The extracted content of the <Description> tag.
+ */
+export function extractDescriptionContent(input: string): string {
+  const descriptionRegex = /<Description>(.*?)<\/Description>/;
+  const match = input.match(descriptionRegex);
+  return match ? match[1] : '';
+}

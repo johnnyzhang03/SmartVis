@@ -1,16 +1,16 @@
 import OpenAI from 'openai';
-import { TextContentBlock } from 'openai/resources/beta/threads/messages';
+import {
+  TextContentBlock,
+  ImageFileContentBlock
+} from 'openai/resources/beta/threads/messages';
+import { extractTitleContent, extractDescriptionContent } from './util';
 
 export interface ChartInformation {
   src: string;
+  title: string;
   description: string;
 }
 
-interface ReturnObject {
-  id: string;
-  file_id: string;
-  description: string;
-}
 const openai = new OpenAI({
   apiKey: '',
   dangerouslyAllowBrowser: true
@@ -57,21 +57,26 @@ export async function generateChart(csvFile: File) {
 
   if (run.status === 'completed') {
     const messages = await openai.beta.threads.messages.list(run.thread_id);
-    const message = messages.data[0];
     const responseArray: ChartInformation[] = [];
-    if (message.role === 'assistant') {
-      const textContent = <TextContentBlock>message.content[0];
-      if (textContent.type === 'text') {
+    for (let message of messages.data) {
+      if (message.role === 'assistant' && message.content.length === 2) {
+        // Get image src from the response
+        const imageContent = <ImageFileContentBlock>message.content[0];
+        const src = await getSrcFromFileId(imageContent.image_file.file_id);
+
+        // Get title and description from the response
+        const textContent = <TextContentBlock>message.content[1];
         const text = textContent.text.value;
-        const jsonList: ReturnObject[] = extractJsonObject(text);
-        for (let item of jsonList) {
-          let src = await idToSrc(item.file_id);
-          const response: ChartInformation = {
-            src: src,
-            description: text
-          };
-          responseArray.push(response);
-        }
+        const title = extractTitleContent(text);
+        const description = extractDescriptionContent(text);
+
+        // Put the information together
+        const response: ChartInformation = {
+          src: src,
+          title: title,
+          description: description
+        };
+        responseArray.push(response);
       }
     }
     return responseArray;
@@ -83,7 +88,7 @@ export async function generateChart(csvFile: File) {
    * Inputs OpenAI File object's id
    * Returns src needed in img label
    */
-  async function idToSrc(id: string) {
+  async function getSrcFromFileId(id: string) {
     const imageFile = await openai.files.content(id);
     const imageData = await imageFile.arrayBuffer();
     let binary = '';
@@ -92,23 +97,5 @@ export async function generateChart(csvFile: File) {
       binary += String.fromCharCode(bytes[i]);
     }
     return 'data:image/png;base64,' + window.btoa(binary);
-  }
-
-  function extractJsonObject(jsonString: string): ReturnObject[] {
-    try {
-      // Remove the leading and trailing backticks and the 'json' label if present
-      const cleanedString = jsonString
-        .trim()
-        .replace(/^```json/, '')
-        .replace(/```$/, '')
-        .trim();
-
-      // Parse the JSON string
-      const jsonObject = JSON.parse(cleanedString);
-      return jsonObject;
-    } catch (error) {
-      console.error('Failed to parse JSON string:', error);
-      return [];
-    }
   }
 }
