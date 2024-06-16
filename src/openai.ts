@@ -104,9 +104,9 @@ export async function generateChart(csvFile: File) {
 
 export async function generateCode(index: number) {
   const prompt = `
-  Please output the Python for generating the ${index + 1}-th$ chart.
+  Please output the Python code for generating the ${index + 1}-th$ chart.
   The Python code should contain necessary import like import pandas as pd.
-  Also it should contain 
+  Also it should contain file loading function call like pd.read_csv().
   `;
 
   await openai.beta.threads.messages.create(thread.id, {
