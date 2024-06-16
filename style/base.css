@@ -3,12 +3,6 @@
 
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
-.my-apodWidget {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: auto;
-  }
 
 .jp-CodeCell .jp-CellFooter {
     height: auto;
@@ -17,56 +11,58 @@
     margin-left: 73px;
   }
 
-  .btn {
-    margin-top: 10px;
-  }
+.upload {
+  height: 30%;
+  margin: 10px
+}
 
-  .jp-shout-button {
-    height: 30px;
-    width: 150px;
-    margin: 8px;
-    padding-top: 9px;
-    text-align: center;
-    vertical-align: middle;
-    border-radius: 2px;
-    background-color: #2296f3;
-    color: #212121;
-  }
-  
-  .jp-shout-summary {
-    margin: 4px;
-  }
+.user-prompt {
+  margin: 10px;
+}
+
+.temperature {
+  margin: 10px
+}
+
+.button-container {
+  text-align: center;
+}
+
+
 
   /* Modify Jupyter Styles */
 
-.lm-BoxPanel-child,
-.jp-FileBrowser-Panel,
-.lm-StackedPanel-child,
-.jp-FileBrowser-toolbar {
-  background-color: #aecad4 !important;
+#JupyterFileWidget {
+  background-color:aliceblue !important;
 }
 
-#top-panel-wrapper,
-#jp-top-bar {
-  background-color: #aecad4 !important;
+.lm-DockPanel-tabBar {
+  background-color: aliceblue;
 }
 
-#menu-panel-wrapper,
-#jp-MainMenu,
-#menu-panel {
-  background-color: #aecad4 !important;
+#jp-main-dock-panel {
+  max-width: 1450px;
 }
 
-.jp-NotebookPanel-toolbar {
-  background-color: #aecad4 !important;
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 800px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
-.lm-MenuBar-content {
-  color: #02484d;
+.chart-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 20px;
 }
 
-.lm-TabBar-content,
-.jp-DirListing-content,
-.lm-MenuBar-content {
-  font-size: small;
+.code-btn {
+  margin: 10px 0 10px 0;
 }

@@ -10,7 +10,7 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "noImplicitAny": true,
-    // "noUnusedLocals": true,
+    "noUnusedLocals": true,
     "preserveWatchOutput": true,
     "resolveJsonModule": true,
     "outDir": "lib",
@@ -18,7 +18,10 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "ES2018",
-    "types": ["jest"]
+    "skipLibCheck": true,
   },
-  "include": ["src/*"]
+  "include": [ 
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
 }
