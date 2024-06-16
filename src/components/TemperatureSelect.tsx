@@ -3,13 +3,13 @@ import { Slider } from 'antd';
 import type { SliderSingleProps } from 'antd';
 
 const marks: SliderSingleProps['marks'] = {
-  0: '0°C',
+  0: '0',
   100: {
     style: {
-      color: '#f50',
+      color: '#f50'
     },
-    label: <strong>100°C</strong>,
-  },
+    label: <strong>2</strong>
+  }
 };
 
 export const TemperatureSelect: React.FC = () => (

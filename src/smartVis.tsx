@@ -10,8 +10,7 @@ import { ReactWidget } from '@jupyterlab/ui-components';
 import { Widget } from '@lumino/widgets';
 import SidePanel from './components/SidePanel';
 import React from 'react';
-import { generateChart } from './openai';
-import { extractPythonCode } from './util';
+import { generateCode } from './openai';
 
 export const smartVis: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlab-examples/shout-button:plugin',
@@ -38,7 +37,7 @@ export const smartVis: JupyterFrontEndPlugin<void> = {
     //   activeCell.model.sharedModel.setSource(`#New Code\n${response}`);
     // });
 
-    eventCenter.on('addNewCell', async file => {
+    eventCenter.on('addNewCell', async index => {
       const notebook = tracker.currentWidget!.content;
       const model = tracker.currentWidget!.model;
       model?.sharedModel.addCell({
@@ -54,14 +53,9 @@ export const smartVis: JupyterFrontEndPlugin<void> = {
       const cellModel: CellModel = cellList?.get(
         cellList.length - 1
       ) as CellModel;
-      cellModel.sharedModel.setSource('Analyzing...');
-      const returnMessage = await generateChart(file);
-      if (typeof returnMessage === 'string') {
-        const extractedCode = extractPythonCode(returnMessage, file.name);
-      if (typeof extractedCode === 'string') {
-        cellModel.sharedModel.setSource(extractedCode);
-      }
-      }
+      cellModel.sharedModel.setSource('Generating...');
+      const returnMessage = await generateCode(index);
+      cellModel.sharedModel.setSource(returnMessage);
     });
   }
 };
