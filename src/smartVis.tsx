@@ -28,15 +28,6 @@ export const smartVis: JupyterFrontEndPlugin<void> = {
     myWidget.title.caption = 'Side panel for AI';
     app.shell.add(myWidget, 'right');
 
-    // Function part
-    // eventCenter.on('fixCurrentCell', async () => {
-    //   let notebook = tracker.currentWidget!;
-    //   let activeCell = notebook.content.activeCell!;
-    //   const sourceCode = activeCell.model.sharedModel.getSource();
-    //   let response = await passToOpenAI(sourceCode);
-    //   activeCell.model.sharedModel.setSource(`#New Code\n${response}`);
-    // });
-
     eventCenter.on('addNewCell', async index => {
       const notebook = tracker.currentWidget!.content;
       const model = tracker.currentWidget!.model;
